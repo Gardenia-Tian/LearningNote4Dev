@@ -1,10 +1,13 @@
 import os
 import numpy as np
 import pandas as pd
-from roofline_V100 import roofline
+from roofline import roofline
+import sys
 
+# 获取命令行参数
+args = sys.argv
 
-path = './csv_V100'
+path = './output'
 filenames=os.listdir(path)
 files = [os.path.join(path,filename) for filename in filenames]
 print(files)
@@ -53,14 +56,11 @@ flags=['all'] #'HBM','L2','L1' or 'all'
 for tag in tags:
     for flag in flags:
         dfm=dfs[tag]
-        LABELS += [tag]
-        FLOPS  += [dfm['all FLOPs'].sum() / dfm['Time'].sum() / 1024 / 1024 / 1024]
-        AIHBM  += [dfm['all FLOPs'].sum() / dfm['dram__bytes.sum'].sum()]
-        AIL2   += [dfm['all FLOPs'].sum() / dfm['lts__t_bytes.sum'].sum()]
-        AIL1   += [dfm['all FLOPs'].sum() / dfm['l1tex__t_bytes.sum'].sum()]
+        LABELS = [tag]
+        FLOPS  = [dfm['all FLOPs'].sum() / dfm['Time'].sum() / 1024 / 1024 / 1024]
+        AIHBM  = [dfm['all FLOPs'].sum() / dfm['dram__bytes.sum'].sum()]
+        AIL2   = [dfm['all FLOPs'].sum() / dfm['lts__t_bytes.sum'].sum()]
+        AIL1   = [dfm['all FLOPs'].sum() / dfm['l1tex__t_bytes.sum'].sum()]
         print (tag,": ",FLOPS[-1], " Gflops, ",AIHBM[-1]," ,", AIL2[-1],",", AIL1[-1],",", dfm['all FLOPs'].sum(),",", dfm['dram__bytes.sum'].sum(),",",dfm['Time'].sum())
-        # print (tag,",",AIHBM,",", dfm['all FLOPs'].sum(),",", dfm['dram__bytes.sum'].sum(),",",dfm['Time'].sum())
-        # print ("\"",tag,"\": ", AIHBM,",")
-        
-        
-roofline("DGX", FLOPS, AIHBM, AIL2, AIL1, LABELS, flag)
+          
+    roofline("./result/" + tag + "_40960M_20480K_40960N", dfm['Time'].sum(), FLOPS, AIHBM, AIL2, AIL1, LABELS, flag)

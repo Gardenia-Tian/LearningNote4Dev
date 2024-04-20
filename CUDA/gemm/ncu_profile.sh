@@ -25,5 +25,7 @@ metrics="${metrics}smsp__inst_executed_pipe_tensor.sum,"
 # DRAM, L2 and L1
 metrics="${metrics}dram__bytes.sum,lts__t_bytes.sum,l1tex__t_bytes.sum"
 
-
-ncu --metrics $metrics --csv --print-fp ./profile > ./profile.csv
+export CUDA_VISIBLE_DEVICES=1
+# nvcc profile.cu -o profile && \
+ncu --metrics $metrics --csv --print-fp ./exec/share_tile 40960 20480 40960 > ./output/$1.csv
+# python postprocess.py
